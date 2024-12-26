@@ -1,35 +1,17 @@
-# Usa una imagen Node.js Alpine como base
-FROM node:18-alpine
+# Usa una versión compatible de Node.js
+FROM node:18
 
-# Establece la carpeta raíz del contenedor
-WORKDIR /usr/src/app
-
-# Copia y configura las dependencias del cliente
+# Establece el directorio de trabajo
 WORKDIR /usr/src/app/client
-COPY client/package*.json ./
-RUN npm install --no-cache
 
-# Copia el código fuente del cliente
-COPY client/ ./
+# Copia los archivos necesarios
+COPY package*.json ./
 
-# Asegura permisos ejecutables para los binarios locales y ejecuta la construcción explícitamente con npx
-RUN chmod -R +x node_modules/.bin && npx webpack --mode production
+# Limpia instalaciones previas y reinstala dependencias
+RUN rm -rf node_modules package-lock.json && npm install
 
-# Configura la carpeta raíz para el servidor
-WORKDIR /usr/src/app/server
+# Instala webpack explícitamente
+RUN npm install --save-dev webpack webpack-cli
 
-# Copia y configura las dependencias del servidor
-COPY server/package*.json ./
-RUN npm install --no-cache
-
-# Copia el código fuente del servidor
-COPY server/ ./
-
-# Copia los archivos construidos del cliente al directorio público del servidor
-RUN mkdir -p ./public && cp -R /usr/src/app/client/dist/* ./public/
-
-# Expone el puerto del servidor
-EXPOSE 5000
-
-# Comando predeterminado para ejecutar el servidor
-CMD ["npm", "start"]
+# Asegura permisos y ejecuta webpack directamente
+RUN chmod -R +x node_modules/.bin && node_modules/.bin/webpack --mode production
