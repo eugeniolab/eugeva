@@ -1,41 +1,36 @@
-# Use an alpine Node.js runtime as a parent image
+# Usa una imagen Node.js Alpine como base
 FROM node:18-alpine
 
-# Set the working directory in the container for the client
+# Establece la carpeta raíz del contenedor
+WORKDIR /usr/src/app
+
+# Copia y configura las dependencias del cliente
 WORKDIR /usr/src/app/client
-
-# Copy the client package.json and package-lock.json
 COPY client/package*.json ./
+RUN npm install --no-cache
 
-# Install the client dependencies
-RUN npm install
-
-# Copy the client source code
-COPY client/ ./
-
+# Asegura permisos ejecutables para los binarios locales
 RUN chmod -R +x node_modules/.bin
 
-# Build the client application
+# Copia el código fuente del cliente y construye la aplicación
+COPY client/ ./
 RUN npm run build
 
-# Set the working directory in the container for the server
+# Configura la carpeta raíz para el servidor
 WORKDIR /usr/src/app/server
 
-# Copy the server package.json and package-lock.json
+# Copia y configura las dependencias del servidor
 COPY server/package*.json ./
+RUN npm install --no-cache
 
-# Install the server dependencies
-RUN npm install
-
-# Copy the server source code
+# Copia el código fuente del servidor
 COPY server/ ./
 
-# Copy the client build files to the server's public directory
+# Copia los archivos construidos del cliente al directorio público del servidor
 RUN mkdir -p ./public && cp -R /usr/src/app/client/dist/* ./public/
 
-# Expose the port the server will run on
+# Expone el puerto del servidor
 EXPOSE 5000
 
-# Command to run the server
+# Comando predeterminado para ejecutar el servidor
 CMD ["npm", "start"]
-
