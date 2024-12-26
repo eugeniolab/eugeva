@@ -1,5 +1,5 @@
 # Use an alpine Node.js runtime as a parent image
-FROM node:14-alpine
+FROM node:18-alpine
 
 # Set the working directory in the container for the client
 WORKDIR /usr/src/app/client
@@ -8,7 +8,10 @@ WORKDIR /usr/src/app/client
 COPY client/package*.json ./
 
 # Install the client dependencies
-RUN npm install
+RUN npm install -g npm@latest && \
+    rm -rf node_modules package-lock.json && \
+    npm install && \
+    npm audit fix
 
 # Copy the client source code
 COPY client/ ./
