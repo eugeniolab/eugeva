@@ -13,6 +13,8 @@ RUN npm install
 # Copy the client source code
 COPY client/ ./
 
+RUN chmod -R +x node_modules/.bin
+
 # Build the client application
 RUN npm run build
 
