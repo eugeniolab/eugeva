@@ -8,10 +8,7 @@ WORKDIR /usr/src/app/client
 COPY client/package*.json ./
 
 # Install the client dependencies
-RUN npm install -g npm@latest && \
-    rm -rf node_modules package-lock.json && \
-    npm install && \
-    npm audit fix
+RUN npm install
 
 # Copy the client source code
 COPY client/ ./
