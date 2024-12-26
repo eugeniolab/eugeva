@@ -9,12 +9,11 @@ WORKDIR /usr/src/app/client
 COPY client/package*.json ./
 RUN npm install --no-cache
 
-# Asegura permisos ejecutables para los binarios locales
-RUN chmod -R +x node_modules/.bin
-
-# Copia el código fuente del cliente y construye la aplicación
+# Copia el código fuente del cliente
 COPY client/ ./
-RUN npm run build
+
+# Asegura permisos ejecutables para los binarios locales y ejecuta la construcción explícitamente con npx
+RUN chmod -R +x node_modules/.bin && npx webpack --mode production
 
 # Configura la carpeta raíz para el servidor
 WORKDIR /usr/src/app/server
